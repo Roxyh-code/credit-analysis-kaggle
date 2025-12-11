@@ -12,3 +12,6 @@
 
 ## 2025-11-22T12:16:02
 - updated config
+
+## 2025-12-11T12:03:30
+- improved readability
