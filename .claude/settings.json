@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git --version)",
+      "Bash(git -C \"c:/Users/Yang/Desktop/data/csc316/A3\" status)"
+    ]
+  }
+}

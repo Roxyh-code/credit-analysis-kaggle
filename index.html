@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Responsibility Paradox — Loan Default River</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+</head>
+<body>
+
+  <!-- Loading Screen -->
+  <div id="loading-screen">
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <div class="loading-title">Loading loan data…</div>
+      <div class="loading-subtitle">255,347 records</div>
+      <div class="loading-bar-wrap">
+        <div class="loading-bar" id="loading-bar"></div>
+      </div>
+      <div class="loading-status" id="loading-status">Initializing…</div>
+    </div>
+  </div>
+
+  <!-- Main App -->
+  <div id="app" style="display:none;">
+
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="header-title">The Responsibility Paradox</div>
+        <div class="header-subtitle">Borrowers with more obligations actually default <em>less</em></div>
+      </div>
+      <div class="header-right">
+        <div class="data-badge">
+          <span class="badge-num">255,347</span>
+          <span class="badge-label">loan records</span>
+        </div>
+        <div class="data-badge danger">
+          <span class="badge-num">11.61%</span>
+          <span class="badge-label">overall default rate</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Floating Tooltip -->
+    <div id="tooltip"></div>
+
+    <!-- River View -->
+    <div id="tab-river" class="tab-pane active">
+      <!-- Toolbar -->
+      <div class="river-toolbar">
+        <span class="river-toolbar-label">Split factor:</span>
+        <button class="factor-btn active" data-factor="HasCoSigner">Co-Signer</button>
+        <button class="factor-btn" data-factor="HasMortgage">Mortgage</button>
+        <button class="factor-btn" data-factor="HasDependents">Dependents</button>
+        <button class="factor-btn" data-factor="MaritalStatus">Married</button>
+        <button class="factor-btn" id="river-reset" style="margin-left:8px; border-color:#f85149; color:#f85149;">Reset</button>
+        <div class="river-speed-wrap">
+          <span class="river-toolbar-label">Particle speed:</span>
+          <input type="range" id="river-speed" min="0.2" max="3" step="0.1" value="1.0">
+        </div>
+      </div>
+
+      <div class="river-body">
+        <!-- Main canvas -->
+        <div class="river-canvas" id="river-canvas"></div>
+
+        <!-- Right sidebar -->
+        <div class="river-sidebar">
+          <div class="river-sidebar-top">
+            <div class="river-sidebar-title">Split Detail</div>
+          </div>
+          <div id="river-lens-detail">
+            <div class="ld-hint">Click any node to<br>split the river by factor<br>and compare default rates<br><b style="color:#58a6ff">side by side</b>.</div>
+          </div>
+
+          <!-- Paradox summary panel -->
+          <div class="river-paradox-panel">
+            <div class="paradox-title">Global Paradox Data</div>
+            <div class="paradox-row">
+              <span class="paradox-label">Has co-signer</span>
+              <span class="paradox-diff">−2.51%</span>
+            </div>
+            <div class="paradox-row">
+              <span class="paradox-label">Has mortgage</span>
+              <span class="paradox-diff">−1.47%</span>
+            </div>
+            <div class="paradox-row">
+              <span class="paradox-label">Has dependents</span>
+              <span class="paradox-diff">−2.22%</span>
+            </div>
+            <div class="paradox-row">
+              <span class="paradox-label">Married</span>
+              <span class="paradox-diff">−2.13%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/dataLoader.js"></script>
+  <script src="js/riverTab.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
