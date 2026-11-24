@@ -1,0 +1,50 @@
+name: Capture authentic app screenshots
+on:
+  push:
+    branches: [docs/visual-readme-20261123]
+    paths: [.github/workflows/capture-readme.yml]
+permissions:
+  contents: write
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install headless browser driver and serve local CSV
+        run: |
+          npm install --no-save --no-package-lock puppeteer-core@24
+          python3 -m http.server 8000 --bind 127.0.0.1 > /tmp/credit-server.log 2>&1 &
+          for i in $(seq 1 25); do curl -fsS http://127.0.0.1:8000/index.html > /dev/null && break; sleep 2; done
+      - name: Capture real D3 analysis
+        run: |
+          mkdir -p docs/screenshots
+          node <<'NODE'
+          const p=require('puppeteer-core');
+          (async()=>{
+            const browser=await p.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox','--disable-dev-shm-usage']});
+            const page=await browser.newPage();await page.setViewport({width:1600,height:950,deviceScaleFactor:1});page.setDefaultTimeout(120000);
+            page.on('pageerror',e=>console.error('PAGE ERROR',e.message));
+            await page.goto('http://127.0.0.1:8000/index.html',{waitUntil:'domcontentloaded',timeout:60000});
+            await page.waitForFunction(()=>window.AppState?.data?.length>250000&&document.querySelectorAll('#river-canvas svg .node-rect').length>0,{timeout:120000});
+            await new Promise(r=>setTimeout(r,1800));
+            await page.screenshot({path:'docs/screenshots/loan-river.png'});
+            await page.evaluate(()=>{const n=document.querySelector('#river-canvas svg .node-rect');if(n)n.dispatchEvent(new MouseEvent('click',{bubbles:true}));});
+            await new Promise(r=>setTimeout(r,2300));
+            await page.screenshot({path:'docs/screenshots/loan-split.png'});
+            console.log('Loaded rows:',await page.evaluate(()=>window.AppState.data.length));
+            await browser.close();
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+          file docs/screenshots/*.png
+      - name: Commit screenshot assets
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/screenshots/*.png
+          git diff --cached --quiet && exit 0
+          git commit -m "docs: add authentic browser screenshots for README"
+          git push origin HEAD:docs/visual-readme-20261123
